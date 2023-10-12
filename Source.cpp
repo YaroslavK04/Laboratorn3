@@ -7,7 +7,7 @@
 #include <math.h>
 using namespace std;
 
-struct one_day {
+struct one_day { // структура для 1 предмета в расписании
 	char predmet[20];
 	int hours, minute;
 	struct one_day* next;
@@ -16,13 +16,13 @@ struct priority_queue
 {
 	int den, mauns, colvo_predmet;
 	struct priority_queue* next; // ссылка на следующий элемент 
-	struct one_day* head_day;
+	struct one_day* head_day; 
 };
 
 struct priority_queue* head = NULL, * last = NULL; // указатели на первый и последний элементы списка
 int dlinna_ochered_stek = 0;
 
-struct one_day* get_struct_predmet(void)
+struct one_day* get_struct_predmet(void) // создаём элемент структуры для 1 предмета
 {
 	struct one_day* p = NULL;
 	double time;
@@ -37,7 +37,7 @@ struct one_day* get_struct_predmet(void)
 	printf("Введите время (формат 00.00) в которое будет проходить предмет: ");   // вводим данные
 	cin >> time;
 	p->hours = time;
-	p->minute = floorf((time - p->hours) * 100);
+	p->minute = floorf((time - p->hours) * 100); // сохраняем округлённую дробную часть 
 	while (p->hours > 23 || p->minute > 59) {
 		printf("Такого времени существовать не может\n Введите другое время: ");   // вводим данные
 		cin >> time;
@@ -59,20 +59,21 @@ struct one_day* get_struct_predmet(void)
 	return p;		// возвращаем указатель на созданный элемент
 }
 
-void input_po_priority_day(struct priority_queue* head_da) {
+void input_po_priority_day(struct priority_queue* head_da) { // создаём соединения между элементами структуры для предметов
 
 	struct one_day* q, * f = NULL;
 	q = get_struct_predmet();
 
 
-	if (head_da->head_day == NULL || (head_da->head_day->hours > q->hours || (head_da->head_day->hours == q->hours && head_da->head_day->minute > q->minute))) {
+	if (head_da->head_day == NULL || (head_da->head_day->hours > q->hours || (head_da->head_day->hours == q->hours && head_da->head_day->minute > q->minute))) { // если время введённого дня меньше времени содержащегося в элементе head, 
+		                                                                                                                                                        //то созданный элемент встаёт на место head
 		q->next = head_da->head_day;
 		head_da->head_day = q;
 
 	}
 	else {
 		f = head_da->head_day;
-		while (f->next != NULL && (f->next->hours < q->hours || (f->next->hours != q->hours && f->next->minute < q->minute))) {
+		while (f->next != NULL && (f->next->hours < q->hours || (f->next->hours != q->hours && f->next->minute < q->minute))) { // прогоняем цикл, пока не найдём место для элемента
 			f = f->next;
 		}
 
@@ -87,7 +88,7 @@ void input_po_priority_day(struct priority_queue* head_da) {
 
 }
 
-struct priority_queue* get_struct(void)
+struct priority_queue* get_struct(void)// создаём элемент структуры для 1 дня
 {
 	struct priority_queue* p = NULL;
 	double dat;
@@ -123,7 +124,7 @@ struct priority_queue* get_struct(void)
 	return p;		// возвращаем указатель на созданный элемент
 }
 
-void input_po_priority() {
+void input_po_priority() { // создаём соединения между элементами структуры для дней
 	struct priority_queue* q, * f = NULL;
 	q = get_struct();
 
@@ -194,7 +195,7 @@ void swap_plase() {
 
 };
 
-void reviwe_one_day() {
+void reviwe_one_day() { // функция для вывода расписание на определённый день ( создал Рябов Святослав)
 	struct priority_queue* p = head;
 	struct one_day* struct_predmet;
 	double vvod;
@@ -203,8 +204,8 @@ void reviwe_one_day() {
 	cin >> vvod;
 	day = vvod;
 	month = floorf((vvod - day) * 100);
-	p = proverka(day, month);
-	while (p == NULL) {
+	p = proverka(day, month);// проверяем существует ли элемент с такой датой 
+	while (p == NULL) { // если элемента не существует, просим ввести другую дату
 		cout << " Такой даты нет!\n Попробуйте ещё раз: ";
 		cin >> vvod;
 		day = vvod;
@@ -214,7 +215,7 @@ void reviwe_one_day() {
 
 	struct_predmet = p->head_day;
 	cout << "---------------------" << endl;
-	if (p->den < 10) {
+	if (p->den < 10) { // если цифра содержащееся в элеменьте < 10, то выводим дополнтельный "0" для простоты понимания даты
 		cout << "0" << p->den;
 	}
 	else {
@@ -239,7 +240,7 @@ void reviwe_one_day() {
 
 }
 
-void review(void)
+void review(void)  // функция для вывода расписание на несколько дней подряд. После вывода на экран элемнт удаляется 
 {
 	int size;
 	struct priority_queue* struc = head;
