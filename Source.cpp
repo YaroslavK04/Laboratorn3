@@ -7,7 +7,7 @@
 #include <math.h>
 using namespace std;
 
-struct one_day { // структура для 1 предмета в расписании
+struct one_day {
 	char predmet[20];
 	int hours, minute;
 	struct one_day* next;
@@ -15,65 +15,113 @@ struct one_day { // структура для 1 предмета в расписании
 struct priority_queue
 {
 	int den, mauns, colvo_predmet;
-	struct priority_queue* next; // ссылка на следующий элемент 
-	struct one_day* head_day; 
+	struct priority_queue* next; // СЃСЃС‹Р»РєР° РЅР° СЃР»РµРґСѓСЋС‰РёР№ СЌР»РµРјРµРЅС‚ 
+	struct one_day* head_day;
 };
 
-struct priority_queue* head = NULL, * last = NULL; // указатели на первый и последний элементы списка
+struct struck_ochered
+{
+	char data[256];  // РїРѕР»РµР·РЅР°СЏ РёРЅС„РѕСЂРјР°С†РёСЏ
+	struct struck_ochered* next; // СЃСЃС‹Р»РєР° РЅР° СЃР»РµРґСѓСЋС‰РёР№ СЌР»РµРјРµРЅС‚ 
+};
+
+struct priority_queue* head = NULL, * last = NULL; // СѓРєР°Р·Р°С‚РµР»Рё РЅР° РїРµСЂРІС‹Р№ Рё РїРѕСЃР»РµРґРЅРёР№ СЌР»РµРјРµРЅС‚С‹ СЃРїРёСЃРєР°
+struct struck_ochered* head_ochered = NULL, * last_ochered = NULL;
 int dlinna_ochered_stek = 0;
 
-struct one_day* get_struct_predmet(void) // создаём элемент структуры для 1 предмета
+struct struck_ochered* get_ochered(void) //==============================================
+{
+	struct struck_ochered* p = NULL;
+	char s[256];
+	if ((p = (struck_ochered*)malloc(sizeof(struct struck_ochered))) == NULL)  // РІС‹РґРµР»СЏРµРј РїР°РјСЏС‚СЊ РїРѕРґ РЅРѕРІС‹Р№ СЌР»РµРјРµРЅС‚ СЃРїРёСЃРєР°
+	{
+		printf("РћС€РёР±РєР° РїСЂРё СЂР°СЃРїСЂРµРґРµР»РµРЅРёРё РїР°РјСЏС‚Рё\n");
+		exit(1);
+	}
+
+	printf("Р’РІРµРґРёС‚Рµ РЅР°Р·РІР°РЅРёРµ РѕР±СЉРµРєС‚Р°: \n");   // РІРІРѕРґРёРј РґР°РЅРЅС‹Рµ
+	scanf("%s", &s);
+	if (s == 0)
+	{
+		printf("Р—Р°РїРёСЃСЊ РЅРµ Р±С‹Р»Р° РїСЂРѕРёР·РІРµРґРµРЅР°\n");
+		return NULL;
+	}
+	strcpy(p->data, s);
+
+
+	p->next = NULL;
+
+	return p;		// РІРѕР·РІСЂР°С‰Р°РµРј СѓРєР°Р·Р°С‚РµР»СЊ РЅР° СЃРѕР·РґР°РЅРЅС‹Р№ СЌР»РµРјРµРЅС‚
+}
+
+void  review_stek(int razmer) 
+{
+	struct struck_ochered* head_struc = head_ochered, * last_struc = head_ochered;
+	if (head_ochered == NULL)
+	{
+		printf("РЎРїРёСЃРѕРє РїСѓСЃС‚\n");
+	}
+	for (int i = 0; i < razmer; i++) {
+		head_struc = head_ochered;
+		printf("РРјСЏ - %s \n", head_ochered->data);
+		head_ochered = head_ochered->next;
+		delete head_struc;
+	}
+	return;
+}
+
+
+struct one_day* get_struct_predmet(void)
 {
 	struct one_day* p = NULL;
 	double time;
 	char s[20];
 	int colvo_predmetov;
-	if ((p = (one_day*)malloc(sizeof(struct one_day))) == NULL)  // выделяем память под новый элемент списка
+	if ((p = (one_day*)malloc(sizeof(struct one_day))) == NULL)  // РІС‹РґРµР»СЏРµРј РїР°РјСЏС‚СЊ РїРѕРґ РЅРѕРІС‹Р№ СЌР»РµРјРµРЅС‚ СЃРїРёСЃРєР°
 	{
-		printf("Ошибка при распределении памяти\n");
+		printf("РћС€РёР±РєР° РїСЂРё СЂР°СЃРїСЂРµРґРµР»РµРЅРёРё РїР°РјСЏС‚Рё\n");
 		exit(1);
 	}
 
-	printf("Введите время (формат 00.00) в которое будет проходить предмет: ");   // вводим данные
+	printf("Р’РІРµРґРёС‚Рµ РІСЂРµРјСЏ (С„РѕСЂРјР°С‚ 00.00) РІ РєРѕС‚РѕСЂРѕРµ Р±СѓРґРµС‚ РїСЂРѕС…РѕРґРёС‚СЊ РїСЂРµРґРјРµС‚: ");   // РІРІРѕРґРёРј РґР°РЅРЅС‹Рµ
 	cin >> time;
 	p->hours = time;
-	p->minute = floorf((time - p->hours) * 100); // сохраняем округлённую дробную часть 
+	p->minute = floorf((time - p->hours) * 100);
 	while (p->hours > 23 || p->minute > 59) {
-		printf("Такого времени существовать не может\n Введите другое время: ");   // вводим данные
+		printf("РўР°РєРѕРіРѕ РІСЂРµРјРµРЅРё СЃСѓС‰РµСЃС‚РІРѕРІР°С‚СЊ РЅРµ РјРѕР¶РµС‚\n Р’РІРµРґРёС‚Рµ РґСЂСѓРіРѕРµ РІСЂРµРјСЏ: ");   // РІРІРѕРґРёРј РґР°РЅРЅС‹Рµ
 		cin >> time;
 		p->hours = time;
 		p->minute = floorf((time - p->hours) * 100);
 	}
 
-	printf("Введите название предмета: ");   // вводим данные
+	printf("Р’РІРµРґРёС‚Рµ РЅР°Р·РІР°РЅРёРµ РїСЂРµРґРјРµС‚Р°: ");   // РІРІРѕРґРёРј РґР°РЅРЅС‹Рµ
 	scanf("%s", &s);
 	if (s == 0)
 	{
-		printf("Запись не была произведена\n");
+		printf("Р—Р°РїРёСЃСЊ РЅРµ Р±С‹Р»Р° РїСЂРѕРёР·РІРµРґРµРЅР°\n");
 		return NULL;
 	}
 	strcpy(p->predmet, s);
 
 	p->next = NULL;
 
-	return p;		// возвращаем указатель на созданный элемент
+	return p;		// РІРѕР·РІСЂР°С‰Р°РµРј СѓРєР°Р·Р°С‚РµР»СЊ РЅР° СЃРѕР·РґР°РЅРЅС‹Р№ СЌР»РµРјРµРЅС‚
 }
 
-void input_po_priority_day(struct priority_queue* head_da) { // создаём соединения между элементами структуры для предметов
+void input_po_priority_day(struct priority_queue* head_da) {
 
 	struct one_day* q, * f = NULL;
 	q = get_struct_predmet();
 
 
-	if (head_da->head_day == NULL || (head_da->head_day->hours > q->hours || (head_da->head_day->hours == q->hours && head_da->head_day->minute > q->minute))) { // если время введённого дня меньше времени содержащегося в элементе head, 
-		                                                                                                                                                        //то созданный элемент встаёт на место head
+	if (head_da->head_day == NULL || (head_da->head_day->hours > q->hours || (head_da->head_day->hours == q->hours && head_da->head_day->minute > q->minute))) {
 		q->next = head_da->head_day;
 		head_da->head_day = q;
 
 	}
 	else {
 		f = head_da->head_day;
-		while (f->next != NULL && (f->next->hours < q->hours || (f->next->hours != q->hours && f->next->minute < q->minute))) { // прогоняем цикл, пока не найдём место для элемента
+		while (f->next != NULL && (f->next->hours < q->hours || (f->next->hours != q->hours && f->next->minute < q->minute))) {
 			f = f->next;
 		}
 
@@ -88,23 +136,23 @@ void input_po_priority_day(struct priority_queue* head_da) { // создаём соединен
 
 }
 
-struct priority_queue* get_struct(void)// создаём элемент структуры для 1 дня
+struct priority_queue* get_struct(void)
 {
 	struct priority_queue* p = NULL;
 	double dat;
 	int colvo_predmetov;
-	if ((p = (priority_queue*)malloc(sizeof(struct priority_queue))) == NULL)  // выделяем память под новый элемент списка
+	if ((p = (priority_queue*)malloc(sizeof(struct priority_queue))) == NULL)  // РІС‹РґРµР»СЏРµРј РїР°РјСЏС‚СЊ РїРѕРґ РЅРѕРІС‹Р№ СЌР»РµРјРµРЅС‚ СЃРїРёСЃРєР°
 	{
-		printf("Ошибка при распределении памяти\n");
+		printf("РћС€РёР±РєР° РїСЂРё СЂР°СЃРїСЂРµРґРµР»РµРЅРёРё РїР°РјСЏС‚Рё\n");
 		exit(1);
 	}
 
-	printf("Введите дату (формат 31.12): ");   // вводим данные
+	printf("Р’РІРµРґРёС‚Рµ РґР°С‚Сѓ (С„РѕСЂРјР°С‚ 31.12): ");   // РІРІРѕРґРёРј РґР°РЅРЅС‹Рµ
 	cin >> dat;
 	p->den = dat;
 	p->mauns = floorf((dat - p->den) * 100);
 	while (p->den > 31 || p->mauns > 12) {
-		printf("Такой даты существовать не может\n Введите другую дату: ");   // вводим данные
+		printf("РўР°РєРѕР№ РґР°С‚С‹ СЃСѓС‰РµСЃС‚РІРѕРІР°С‚СЊ РЅРµ РјРѕР¶РµС‚\n Р’РІРµРґРёС‚Рµ РґСЂСѓРіСѓСЋ РґР°С‚Сѓ: ");   // РІРІРѕРґРёРј РґР°РЅРЅС‹Рµ
 		cin >> dat;
 		p->den = dat;
 		p->mauns = floorf((dat - p->den) * 100);
@@ -112,7 +160,7 @@ struct priority_queue* get_struct(void)// создаём элемент структуры для 1 дня
 
 	p->head_day = NULL;
 
-	cout << "Сколько предметов вы хотите внести: ";
+	cout << "РЎРєРѕР»СЊРєРѕ РїСЂРµРґРјРµС‚РѕРІ РІС‹ С…РѕС‚РёС‚Рµ РІРЅРµСЃС‚Рё: ";
 	cin >> colvo_predmetov;
 	p->colvo_predmet = colvo_predmetov;
 	for (int i = 0; i < colvo_predmetov; i++) {
@@ -121,10 +169,10 @@ struct priority_queue* get_struct(void)// создаём элемент структуры для 1 дня
 
 	p->next = NULL;
 
-	return p;		// возвращаем указатель на созданный элемент
+	return p;		// РІРѕР·РІСЂР°С‰Р°РµРј СѓРєР°Р·Р°С‚РµР»СЊ РЅР° СЃРѕР·РґР°РЅРЅС‹Р№ СЌР»РµРјРµРЅС‚
 }
 
-void input_po_priority() { // создаём соединения между элементами структуры для дней
+void input_po_priority() {
 	struct priority_queue* q, * f = NULL;
 	q = get_struct();
 
@@ -150,10 +198,48 @@ void input_po_priority() { // создаём соединения между элементами структуры для 
 
 }
 
+void ochered_stek(void) { //==============================================
+	struct struck_ochered* q, * f = NULL;
+	q = get_ochered();
+	if (head_ochered == NULL) {
+		head_ochered = q;
+		last_ochered = q;
+	}
+	else {
+		q->next = head_ochered;
+		head_ochered = q;
+	}
+}
+
+void review_ochered(int razmer)
+{
+	struct struck_ochered* head_struc = head_ochered, * last_struc = last_ochered;
+	if (head == NULL)
+	{
+		printf("РЎРїРёСЃРѕРє РїСѓСЃС‚\n");
+	}
+	for (int i = 0; i < razmer; i++) {
+
+		printf("РРјСЏ - %s \n", last_struc->data);
+		if (head_struc != last_struc) {
+			while (head_struc->next != last_struc) {
+				head_struc = head_struc->next;
+			}
+			delete last_struc;
+			last_struc = head_struc;
+			head_struc = head_ochered;
+		}
+
+	}
+	last_ochered = last_struc;
+
+	return;
+
+}
 
 struct priority_queue* proverka(int day, int month) {
-	struct priority_queue* element = head;
-	while (element != NULL && (month != element->mauns || day != element->den)) {
+	struct priority_queue* element= head;
+	while (element != NULL && (month != element->mauns   || day != element->den)) {
 		element = element->next;
 	}
 	return element;
@@ -161,28 +247,28 @@ struct priority_queue* proverka(int day, int month) {
 void swap_plase() {
 	double vvod;
 	int day = 0, month, save_size;
-	struct priority_queue* p, * dayt1 = NULL, * dayt2 = NULL;
+	struct priority_queue* p, * dayt1 = NULL, * dayt2=NULL;
 	struct one_day* save;
-	cout << " Введите даты дней, которые хотите поменять местами: \n Первая дата (формат 31.12): ";
+	cout << " Р’РІРµРґРёС‚Рµ РґР°С‚С‹ РґРЅРµР№, РєРѕС‚РѕСЂС‹Рµ С…РѕС‚РёС‚Рµ РїРѕРјРµРЅСЏС‚СЊ РјРµСЃС‚Р°РјРё: \n РџРµСЂРІР°СЏ РґР°С‚Р° (С„РѕСЂРјР°С‚ 31.12): ";
 	for (int i = 0; i < 2; i++) {
 		cin >> vvod;
 		day = vvod;
 		month = floorf((vvod - day) * 100);
 		p = proverka(day, month);
 		while (p == NULL) {
-			cout << " Такой даты нет!\n Попробуйте ещё раз: ";
+			cout << " РўР°РєРѕР№ РґР°С‚С‹ РЅРµС‚!\n РџРѕРїСЂРѕР±СѓР№С‚Рµ РµС‰С‘ СЂР°Р·: ";
 			cin >> vvod;
 			day = vvod;
 			month = floorf((vvod - day) * 100);
 			p = proverka(day, month);
 		}
-		if (i == 0) {
+		if ( i == 0) {
 			dayt1 = p;
-			cout << " Вторая дата (формат 31.12): ";
+			cout << " Р’С‚РѕСЂР°СЏ РґР°С‚Р° (С„РѕСЂРјР°С‚ 31.12): ";
 		}
-		if (i == 1) { dayt2 = p; }
-
-
+		if (i == 1) {dayt2 = p;}
+		
+		
 	}
 	save = dayt2->head_day;
 	save_size = dayt2->colvo_predmet;
@@ -195,18 +281,18 @@ void swap_plase() {
 
 };
 
-void reviwe_one_day() { // функция для вывода расписание на определённый день ( создал Рябов Святослав)
+void reviwe_one_day() {
 	struct priority_queue* p = head;
 	struct one_day* struct_predmet;
 	double vvod;
 	int day = 0, month;
-	cout << "\nРасписание на какой день вы хотите узнать?\n Введите дату (формат 31.12): ";
+	cout << "\nР Р°СЃРїРёСЃР°РЅРёРµ РЅР° РєР°РєРѕР№ РґРµРЅСЊ РІС‹ С…РѕС‚РёС‚Рµ СѓР·РЅР°С‚СЊ?\n Р’РІРµРґРёС‚Рµ РґР°С‚Сѓ (С„РѕСЂРјР°С‚ 31.12): ";
 	cin >> vvod;
 	day = vvod;
 	month = floorf((vvod - day) * 100);
-	p = proverka(day, month);// проверяем существует ли элемент с такой датой 
-	while (p == NULL) { // если элемента не существует, просим ввести другую дату
-		cout << " Такой даты нет!\n Попробуйте ещё раз: ";
+	p = proverka(day, month);
+	while (p == NULL) {
+		cout << " РўР°РєРѕР№ РґР°С‚С‹ РЅРµС‚!\n РџРѕРїСЂРѕР±СѓР№С‚Рµ РµС‰С‘ СЂР°Р·: ";
 		cin >> vvod;
 		day = vvod;
 		month = floorf((vvod - day) * 100);
@@ -215,7 +301,7 @@ void reviwe_one_day() { // функция для вывода расписание на определённый день ( 
 
 	struct_predmet = p->head_day;
 	cout << "---------------------" << endl;
-	if (p->den < 10) { // если цифра содержащееся в элеменьте < 10, то выводим дополнтельный "0" для простоты понимания даты
+	if (p->den < 10) {
 		cout << "0" << p->den;
 	}
 	else {
@@ -240,12 +326,12 @@ void reviwe_one_day() { // функция для вывода расписание на определённый день ( 
 
 }
 
-void review(void)  // функция для вывода расписание на несколько дней подряд. После вывода на экран элемнт удаляется 
+void review(void)
 {
 	int size;
 	struct priority_queue* struc = head;
 	struct one_day* struct_predmet;
-	cout << " Расписание на сколько дней вы хотите узнать? : ";
+	cout << " Р Р°СЃРїРёСЃР°РЅРёРµ РЅР° СЃРєРѕР»СЊРєРѕ РґРЅРµР№ РІС‹ С…РѕС‚РёС‚Рµ СѓР·РЅР°С‚СЊ? : ";
 	cin >> size;
 	for (int i = 0; i < size; i++) {
 		struc = head;
@@ -276,32 +362,31 @@ void review(void)  // функция для вывода расписание на несколько дней подряд. По
 
 }
 
-
 int main() {
 	setlocale(LC_ALL, "Rus");
 
 	int colvo_elem, vibor, vibor1 = 0, vibor2 = 0;
 
-	printf("1. Список с приоритетом \n2. Очередь \n3. Стек\n");
-	printf("Выберите действие: ");
+	printf("1. РЎРїРёСЃРѕРє СЃ РїСЂРёРѕСЂРёС‚РµС‚РѕРј \n2. РћС‡РµСЂРµРґСЊ \n3. РЎС‚РµРє\n");
+	printf("Р’С‹Р±РµСЂРёС‚Рµ РґРµР№СЃС‚РІРёРµ: ");
 	scanf("%d", &vibor);
 
-	// Обработка выбора пользователя
+	// РћР±СЂР°Р±РѕС‚РєР° РІС‹Р±РѕСЂР° РїРѕР»СЊР·РѕРІР°С‚РµР»СЏ
 	switch (vibor) {
 	case 1:
 		while (vibor2 >= 0) {
-			printf("\n1. Добавить элемент \n2. Вывести расписание на несколько дней подряд\n3. Поменять расписание в 2 днях\n4. Вывести расписание на 1 день\n5. Закончить программу\n");
-			printf("Выберите действие: ");
+			printf("\n1. Р”РѕР±Р°РІРёС‚СЊ СЌР»РµРјРµРЅС‚ \n2. Р’С‹РІРµСЃС‚Рё СЂР°СЃРїРёСЃР°РЅРёРµ РЅР° РЅРµСЃРєРѕР»СЊРєРѕ РґРЅРµР№ РїРѕРґСЂСЏРґ\n3. РџРѕРјРµРЅСЏС‚СЊ СЂР°СЃРїРёСЃР°РЅРёРµ РІ 2 РґРЅСЏС…\n4. Р’С‹РІРµСЃС‚Рё СЂР°СЃРїРёСЃР°РЅРёРµ РЅР° 1 РґРµРЅСЊ\n5. Р—Р°РєРѕРЅС‡РёС‚СЊ РїСЂРѕРіСЂР°РјРјСѓ\n");
+			printf("Р’С‹Р±РµСЂРёС‚Рµ РґРµР№СЃС‚РІРёРµ: ");
 			scanf("%d", &vibor2);
 			while (head == NULL && (vibor2 == 2 || vibor2 == 3 || vibor2 == 4))
 			{
-				cout << "Список пуст!\n1. Добавить элемент \n5. Закончить программу\nВыберите действие: ";
+				cout << "РЎРїРёСЃРѕРє РїСѓСЃС‚!\n1. Р”РѕР±Р°РІРёС‚СЊ СЌР»РµРјРµРЅС‚ \n5. Р—Р°РєРѕРЅС‡РёС‚СЊ РїСЂРѕРіСЂР°РјРјСѓ\nР’С‹Р±РµСЂРёС‚Рµ РґРµР№СЃС‚РІРёРµ: ";
 				cin >> vibor2;
 			}
 			switch (vibor2) {
 			case 1:
 				int colvo_days;
-				printf("Сколько дней в расписании вы хотите заполнить: \n");   // вводим данные
+				printf("РЎРєРѕР»СЊРєРѕ РґРЅРµР№ РІ СЂР°СЃРїРёСЃР°РЅРёРё РІС‹ С…РѕС‚РёС‚Рµ Р·Р°РїРѕР»РЅРёС‚СЊ: \n");   // РІРІРѕРґРёРј РґР°РЅРЅС‹Рµ
 				cin >> colvo_days;
 				for (int i = 0; i < colvo_days; i++) {
 					input_po_priority();
@@ -321,7 +406,7 @@ int main() {
 				vibor2 = -1;
 				break;
 			default:
-				printf("Ошибка. Попробуйте снова.\n");
+				printf("РћС€РёР±РєР°. РџРѕРїСЂРѕР±СѓР№С‚Рµ СЃРЅРѕРІР°.\n");
 			}
 		}
 
@@ -329,16 +414,100 @@ int main() {
 		review();
 		break;
 	case 2:
-		cout << " Пусто\n";
+		while (vibor1 >= 0) {
+			printf("1. Р”РѕР±Р°РІРёС‚СЊ СЌР»РµРјРµРЅС‚ \n2. Р’С‹РІРµСЃС‚Рё Рё СѓРґР°Р»РёС‚СЊ СЌР»РµРјРµРЅС‚\n3. Р—Р°РєРѕРЅС‡РёС‚СЊ РїСЂРѕРіСЂР°РјРјСѓ\n");
+			printf("Р’С‹Р±РµСЂРёС‚Рµ РґРµР№СЃС‚РІРёРµ: ");
+			scanf("%d", &vibor1);
+			while (dlinna_ochered_stek == 0 && vibor1 == 2)
+			{
+				cout << "РЎРїРёСЃРѕРє РїСѓСЃС‚! РЈРґР°Р»СЏС‚СЊ РЅРµС‡РµРіРѕ\n1. Р”РѕР±Р°РІРёС‚СЊ СЌР»РµРјРµРЅС‚ \n3. Р—Р°РєРѕРЅС‡РёС‚СЊ РїСЂРѕРіСЂР°РјРјСѓ\nР’С‹Р±РµСЂРёС‚Рµ РґРµР№СЃС‚РІРёРµ: ";
+				cin >> vibor1;
+			}
+			switch (vibor1) {
+			case 1:
+				cout << "РЎРєРѕР»СЊРєРѕ СЌР»РµРјРµРЅС‚РѕРІ РІС‹ С…РѕС‚РёС‚Рµ РґРѕР±Р°РІРёС‚СЊ: ";
+				cin >> colvo_elem;
+				while (colvo_elem <= 0)
+				{
+					cout << "РЎРїРёСЃРѕРє РЅРµ РјРѕР¶РµС‚ СЃСѓС‰РµСЃС‚РІРѕРІР°С‚СЊ\n РџРѕРїСЂРѕР±СѓР№С‚Рµ РµС‰С‘ СЂР°Р·: ";
+					cin >> colvo_elem;
+				}
+				dlinna_ochered_stek += colvo_elem;
+				for (int i = 0; i < colvo_elem;i++) {
+					ochered_stek();
+				}
+				break;
+			case 2:
+				cout << "РЎРєРѕР»СЊРєРѕ СЌР»РµРјРµРЅС‚РѕРІ РІС‹ С…РѕС‚РёС‚Рµ РІС‹РІРµСЃС‚Рё РЅР° СЌРєСЂР°РЅ Рё СѓРґР°Р»РёС‚СЊ: ";
+				cin >> colvo_elem;
+				while (colvo_elem > dlinna_ochered_stek)
+				{
+					cout << "Р’ РѕС‡РµСЂРµРґРё РЅРµС‚ СЃС‚РѕР»СЊРєРѕ СЌР»РµРјРµРЅС‚РѕРІ.\n РџРѕРїСЂРѕР±СѓР№С‚Рµ РµС‰С‘ СЂР°Р· : ";
+					cin >> colvo_elem;
+				}
+				dlinna_ochered_stek -= colvo_elem;
+				review_ochered(colvo_elem);
+
+				break;
+			case 3:
+				vibor1 = -1;
+				break;
+			default:
+				printf("РћС€РёР±РєР°. РџРѕРїСЂРѕР±СѓР№С‚Рµ СЃРЅРѕРІР°.\n");
+			}
+		}
 		break;
 	case 3:
-		cout << " Пусто\n";
+		while (vibor1 >= 0) {
+			printf("1. Р”РѕР±Р°РІРёС‚СЊ СЌР»РµРјРµРЅС‚ \n2. Р’С‹РІРµСЃС‚Рё Рё СѓРґР°Р»РёС‚СЊ СЌР»РµРјРµРЅС‚\n3. Р—Р°РєРѕРЅС‡РёС‚СЊ РїСЂРѕРіСЂР°РјРјСѓ\n");
+			printf("Р’С‹Р±РµСЂРёС‚Рµ РґРµР№СЃС‚РІРёРµ: ");
+			scanf("%d", &vibor1);
+			while (dlinna_ochered_stek == 0 && vibor1 == 2)
+			{
+				cout << "РЎРїРёСЃРѕРє РїСѓСЃС‚! РЈРґР°Р»СЏС‚СЊ РЅРµС‡РµРіРѕ\n1. Р”РѕР±Р°РІРёС‚СЊ СЌР»РµРјРµРЅС‚ \n3. Р—Р°РєРѕРЅС‡РёС‚СЊ РїСЂРѕРіСЂР°РјРјСѓ\nР’С‹Р±РµСЂРёС‚Рµ РґРµР№СЃС‚РІРёРµ: ";
+				cin >> vibor1;
+			}
+			switch (vibor1) {
+			case 1:
+				cout << "РЎРєРѕР»СЊРєРѕ СЌР»РµРјРµРЅС‚РѕРІ РІС‹ С…РѕС‚РёС‚Рµ РґРѕР±Р°РІРёС‚СЊ: ";
+				cin >> colvo_elem;
+				while (colvo_elem <= 0)
+				{
+					cout << "РЎРїРёСЃРѕРє РЅРµ РјРѕР¶РµС‚ СЃСѓС‰РµСЃС‚РІРѕРІР°С‚СЊ\n РџРѕРїСЂРѕР±СѓР№С‚Рµ РµС‰С‘ СЂР°Р·: ";
+					cin >> colvo_elem;
+				}
+				dlinna_ochered_stek += colvo_elem;
+				for (int i = 0; i < colvo_elem;i++) {
+					ochered_stek();
+				}
+				break;
+			case 2:
+				cout << "РЎРєРѕР»СЊРєРѕ СЌР»РµРјРµРЅС‚РѕРІ РІС‹ С…РѕС‚РёС‚Рµ РІС‹РІРµСЃС‚Рё РЅР° СЌРєСЂР°РЅ Рё СѓРґР°Р»РёС‚СЊ: ";
+				cin >> colvo_elem;
+				while (colvo_elem > dlinna_ochered_stek)
+				{
+					cout << "Р’ РѕС‡РµСЂРµРґРё РЅРµС‚ СЃС‚РѕР»СЊРєРѕ СЌР»РµРјРµРЅС‚РѕРІ.\n РџРѕРїСЂРѕР±СѓР№С‚Рµ РµС‰С‘ СЂР°Р· : ";
+					cin >> colvo_elem;
+				}
+				dlinna_ochered_stek -= colvo_elem;
+				review_stek(colvo_elem);
+
+				break;
+			case 3:
+				vibor1 = -1;
+				break;
+			default:
+				printf("РћС€РёР±РєР°. РџРѕРїСЂРѕР±СѓР№С‚Рµ СЃРЅРѕРІР°.\n");
+			}
+		}
+
 		break;
 	default:
-		printf("Ошибка. Попробуйте снова.\n");
+		printf("РћС€РёР±РєР°. РџРѕРїСЂРѕР±СѓР№С‚Рµ СЃРЅРѕРІР°.\n");
 	}
-	system("pause");
+
 }
+
 
 
 
